@@ -1,55 +1,55 @@
 
-# Imports
+# Importations
 from print import *
 import hashlib
 import random
 import numpy as np
 from scipy.stats import chisquare
 
-# Constants
-BYTE_SIZE: int = 256				# Number of possible values for a byte
+# Constantes
+BYTE_SIZE: int = 256				# Nombre de valeurs possibles pour un octet
 
-# Functions
+# Fonctions
 @handle_error(exceptions=(ValueError,), error_log=3)
-def frequency_test(data: bytes, p: float = 0.5, alpha: float = 0.05) -> tuple[float, bool]:
-	""" Frequency test (monobit test) for randomness (f=p±√n)\n
+def test_frequence(donnees: bytes, p: float = 0.5, alpha: float = 0.05) -> tuple[float, bool]:
+	""" Test de fréquence (test monobit) pour l'aléatoire (f=p±√n)\n
 	Args:
-		data	(bytes):	Data to test for randomness
-		p		(float):	Expected frequency of 1s (default: 0.5)
-		alpha	(float):	Significance level for hypothesis test (default: 0.05)
+		donnees	(bytes):	Données à tester pour l'aléatoire
+		p		(float):	Fréquence attendue de 1 (défaut: 0.5)
+		alpha	(float):	Niveau de signification pour le test d'hypothèse (défaut: 0.05)
 	Returns:
-		tuple[float, bool]: (p-value, whether test passed at significance level alpha)
+		tuple[float, bool]: (valeur-p, si le test est passé au niveau de signification alpha)
 	Raises:
-		ValueError: If p is not between 0 and 1, or if alpha is not between 0 and 1
+		ValueError: Si p n'est pas entre 0 et 1, ou si alpha n'est pas entre 0 et 1
 	"""
-	# Input validation
-	assert 0 <= p <= 1, "Expected frequency p must be between 0 and 1"
-	assert 0 <= alpha <= 1, "Significance level alpha must be between 0 and 1"
-	assert len(data) > 0, "Input data cannot be empty"
+	# Validation des entrées
+	assert 0 <= p <= 1, "La fréquence attendue p doit être entre 0 et 1"
+	assert 0 <= alpha <= 1, "Le niveau de signification alpha doit être entre 0 et 1"
+	assert len(donnees) > 0, "Les données d'entrée ne peuvent pas être vides"
 
-	# Convert bytes to bits and count 1s
-	bits: str = "".join([f"{byte:08b}" for byte in data])
-	ones: int = bits.count("1")
+	# Convertir les octets en bits et compter les 1
+	bits: str = "".join([f"{octet:08b}" for octet in donnees])
+	uns: int = bits.count("1")
 	n: int = len(bits)
 
-	# Calculate observed and expected frequencies
-	observed_freq: float = ones / n
-	expected_freq: float = p
+	# Calculer les fréquences observées et attendues
+	freq_observee: float = uns / n
+	freq_attendue: float = p
 
-	# Calculate chi-square test statistic and p-value
-	f_obs: np.ndarray = np.array([observed_freq, 1 - observed_freq])
-	f_exp: np.ndarray = np.array([expected_freq, 1 - expected_freq])
-	p_value: float = chisquare(f_obs, f_exp).pvalue
+	# Calculer la statistique du test chi-carré et la valeur-p
+	f_obs: np.ndarray = np.array([freq_observee, 1 - freq_observee])
+	f_exp: np.ndarray = np.array([freq_attendue, 1 - freq_attendue])
+	valeur_p: float = chisquare(f_obs, f_exp).pvalue
 
-	# Test passes if we fail to reject null hypothesis
-	passed: bool = p_value >= alpha
-	return p_value, passed
+	# Le test passe si nous ne rejetons pas l'hypothèse nulle
+	passe: bool = valeur_p >= alpha
+	return valeur_p, passe
 
 
-# Test everything
+# Tester tout
 if __name__ == "__main__":
-	fake_data: bytes = bytes(random.randint(0, 255) for _ in range(1000))
-	debug(f"Fake data: {''.join(f'{b:02X}' for b in fake_data)[:25]}...")
-	info(f"Frequency test (p=0.5, alpha=0.05): {frequency_test(fake_data, p=0.5, alpha=0.05)}")
+	donnees_test: bytes = bytes(random.randint(0, 255) for _ in range(1000))
+	debug(f"Données test: {''.join(f'{b:02X}' for b in donnees_test)[:25]}...")
+	info(f"Test de fréquence (p=0.5, alpha=0.05): {test_frequence(donnees_test, p=0.5, alpha=0.05)}")
 	pass
 
