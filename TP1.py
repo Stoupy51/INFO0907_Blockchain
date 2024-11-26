@@ -1,61 +1,38 @@
 
-# Imports
+# Importations
 from src.print import *
-from scipy.stats import chisquare
-import numpy as np
-
-# Constantes
-ALPHA: float = 0.05		# Valeur pour comparer la pvalue
-SIGNES: list[str] = ["Gémeaux", "Balance", "Vierge", "Cancer", "Bélier", "Taureau", "Sagittaire", "Poissons", "Verseau", "Lion", "Scorpion", "Capricorne"]
-EFFECTIFS: list[int] = [97, 93, 88, 81, 76, 73, 71, 66, 65, 64, 64, 58]
-
-
-
-
+from src.hash import hash_naif
+from src.tests import test_khi2, test_rang
+from src.utils import generer_chaines_aleatoires, digest_sha256, conversion_en_int
 
 @measure_time(progress)
 def main():
+    """ Précalculs (Génération de 10000 chaines random """
+    chaines: list[str] = generer_chaines_aleatoires(longueur_mini=64, longueur_maxi=64, nombre_de_chaines=10000)
 
-	# Test du Khi2 sur l'astrologie
-	exp = np.array([sum(EFFECTIFS) / len(SIGNES)] * len(SIGNES))
-	test_khi2 = chisquare(EFFECTIFS, exp)
-	pvalue: float = test_khi2.pvalue
-	if pvalue < ALPHA:
-		warning(f"Ne passe pas le test de Khi2: {pvalue=}")
-	else:
-		info(f"Passe le test du Khi2: {pvalue=}")
+    """ Partie Astrologie (Test du Khi2, Test de rang) """
+    progress("Astrologie", prefix="\n")
+    effectifs: list[int] = [97, 93, 88, 81, 76, 73, 71, 66, 65, 64, 64, 58]
+    info(f"Test du Khi2:\t{test_khi2(effectifs)}")
+    info(f"Test de rang:\t{test_rang(effectifs)}")
 
-	#generation de 10000 chaines random
-	import random
-	chaines= [''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for i in range(70)) for j in range(10000)]
-	
-	# Test du Khi2 sur SHA256
-	# A FAIRE
 
-	# Test d'une fonction naive de hachage
-	from src.hash import hash_naif
-	text1: str = "Bonjour !"
-	text2: str = "bonjour !"
-	hash1: bytes = hash_naif(text1)
-	hash2: bytes = hash_naif(text2)
-	info(f"Hash de '{text1}': {hash1.hex()}")
-	info(f"Hash de '{text2}': {hash2.hex()}")
+    """ Partie SHA256 (Test du Khi2, Test de rang) """
+    progress("SHA256 (8 premiers octets)", prefix="\n")
+    collection_de_sha256: list[int] = [conversion_en_int(digest_sha256(chaine)[:8]) for chaine in chaines]
+    info(f"Test du Khi2:\t{test_khi2(collection_de_sha256)}")
+    info(f"Test de rang:\t{test_rang(collection_de_sha256)}")
 
-	# Test de rang sur 10000 hash naif
-	from src.hash import test_rang
-	chaines_hash_naif = [hash_naif(x) for x in chaines]
-	good, pvalue, rangs = test_rang(chaines_hash_naif)
-	print(good)
-	print(pvalue)
-	print(rangs)
-	print()
 
-	# Test de rang sur 10000 hash SHA256
-	from hashlib import sha256
-	print(test_rang([x[:8] for x in sha10000]))
+    """ Partie Hash Naif (Test du Khi2, Test de rang) """
+    progress("Hash Naif", prefix="\n")
+    collection_de_hash_naif: list[int] = [hash_naif(chaine) for chaine in chaines]
+    info(f"Test du Khi2:\t{test_khi2(collection_de_hash_naif)}")
+    info(f"Test de rang:\t{test_rang(collection_de_hash_naif)}")
 
-	return
+
+    return
 
 if __name__ == "__main__":
-	main()
+    main()
 

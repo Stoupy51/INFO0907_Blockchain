@@ -1,5 +1,9 @@
 
-## PRINT UTILS BY ALEXANDRE COLLIGNON
+## UTILITAIRE DE PRINT FAIT PAR ALEXANDRE COLLIGNON
+## REPRIS DE SON CODE POUR L'UTILISER DANS CE PROJET
+## FONCTIONNALITÉS:
+## - DECORATEURS (silent, measure_time, handle_error)
+## - PRINT DE DIFFÉRENTS TYPES DE MESSAGES (info, debug, suggestion, progress, warning, error)
 
 # Imports
 import os
