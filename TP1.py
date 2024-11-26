@@ -9,21 +9,6 @@ ALPHA: float = 0.05		# Valeur pour comparer la pvalue
 SIGNES: list[str] = ["Gémeaux", "Balance", "Vierge", "Cancer", "Bélier", "Taureau", "Sagittaire", "Poissons", "Verseau", "Lion", "Scorpion", "Capricorne"]
 EFFECTIFS: list[int] = [97, 93, 88, 81, 76, 73, 71, 66, 65, 64, 64, 58]
 
-def transformer_en_binaire(entree: int) -> list[int]:
-	binaire: list[int] = []
-	while entree > 0:
-		binaire.append(entree & 1)
-		entree = entree >> 1
-	return binaire
-
-def test_rang(list_hash_binaire):
-	#créer un tableau des rangs avec effectifs à 0
-	#pour chaque hash 
-	#	transformer en binaire si pas fait
-	#	transformer en matrice carré 4*4
-	#	appeler la fonction rang 
-	#	+1 sur les effectifs
-	rangs: list[int] = [0] * 12
 
 
 
@@ -34,22 +19,40 @@ def main():
 	# Test du Khi2 sur l'astrologie
 	exp = np.array([sum(EFFECTIFS) / len(SIGNES)] * len(SIGNES))
 	test_khi2 = chisquare(EFFECTIFS, exp)
-	statistique: float = test_khi2.statistic
 	pvalue: float = test_khi2.pvalue
-	info(f"Statistiques du test du Khi2: {statistique}")
 	if pvalue < ALPHA:
 		warning(f"Ne passe pas le test de Khi2: {pvalue=}")
 	else:
 		info(f"Passe le test du Khi2: {pvalue=}")
+
+	#generation de 10000 chaines random
+	import random
+	chaines= [''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for i in range(70)) for j in range(10000)]
 	
+	# Test du Khi2 sur SHA256
+	# A FAIRE
+
 	# Test d'une fonction naive de hachage
-	from src.hash import hash_naive
+	from src.hash import hash_naif
 	text1: str = "Bonjour !"
 	text2: str = "bonjour !"
-	hash1: bytes = hash_naive(text1)
-	hash2: bytes = hash_naive(text2)
+	hash1: bytes = hash_naif(text1)
+	hash2: bytes = hash_naif(text2)
 	info(f"Hash de '{text1}': {hash1.hex()}")
 	info(f"Hash de '{text2}': {hash2.hex()}")
+
+	# Test de rang sur 10000 hash naif
+	from src.hash import test_rang
+	chaines_hash_naif = [hash_naif(x) for x in chaines]
+	good, pvalue, rangs = test_rang(chaines_hash_naif)
+	print(good)
+	print(pvalue)
+	print(rangs)
+	print()
+
+	# Test de rang sur 10000 hash SHA256
+	from hashlib import sha256
+	print(test_rang([x[:8] for x in sha10000]))
 
 	return
 
