@@ -65,6 +65,14 @@ def test_rang(list_hash_binaire: Iterable[int]) -> tuple[bool, float, list[int]]
     (False, 0.0, [0, 3, 0, 0, 0, 0, 0, 0, 0])
     >>> test_rang([10, 20, 30, 40])
     (False, 0.0, [0, 4, 0, 0, 0, 0, 0, 0, 0])
+    >>> test_rang([""])
+    Traceback (most recent call last):
+        ...
+    AssertionError: Tous les éléments de la distribution observée doivent être des entiers
+    >>> test_rang([10, 20, 30, 2**64])
+    Traceback (most recent call last):
+        ...
+    AssertionError: Tous les éléments de la distribution observée doivent être des entiers plus petits que 2**64
     """
     # Assertions
     assert all(isinstance(hash, int) for hash in list_hash_binaire), "Tous les éléments de la distribution observée doivent être des entiers"
@@ -75,14 +83,14 @@ def test_rang(list_hash_binaire: Iterable[int]) -> tuple[bool, float, list[int]]
 
     # Pour chaque hash, on transforme en binaire, on calcule le rang et on incrémente l'effectif du rang
     for hash in list_hash_binaire:
-        matrice_binaire = transformer_en_binaire(hash)
-        rang = rangF2(matrice_binaire)
+        matrice_binaire: np.ndarray = transformer_en_binaire(hash)
+        rang: int = rangF2(matrice_binaire)
         rangs[rang] += 1
 
     # Normalisation des effectifs (pour avoir des probas)
     rangs_normalises: list[float] = [i/len(list_hash_binaire) for i in rangs]
 
     # Test du Khi2
-    test_khi2 = chisquare(rangs_normalises, EXP_RANG)
+    test_khi2: tuple[float, float] = chisquare(rangs_normalises, EXP_RANG)
     return test_khi2.pvalue > 0.05, test_khi2.pvalue, rangs
 

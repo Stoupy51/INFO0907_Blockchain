@@ -22,10 +22,12 @@ def hash_naif(chaine: str|bytes, nb_octets: int = 8) -> int:
         chaine = chaine.encode("utf-8")
     assert isinstance(chaine, bytes), "Les données d'entrée doivent être une chaîne ou des bytes"
 
-    # Hachage naïf
+    # Hachage naïf (on additionne tous les octets)
+    modulo: int = 2**(8*nb_octets)
     sortie: int = 0
     for octet in chaine:
-        sortie += octet
-    sortie = sortie % (2**(8*nb_octets))
+        sortie = (sortie + octet) % modulo
+    
+    # On renvoie la sortie
     return sortie
 

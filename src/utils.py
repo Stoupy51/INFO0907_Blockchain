@@ -113,7 +113,7 @@ def transformer_en_binaire(entier: int, taille: int = 8) -> np.ndarray:
     array([[1, 0, 1, 1, 0, 0, 1, 0]])
     """
     # Convertit l'entier en une séquence d'octets
-    octets = entier.to_bytes(taille, byteorder="big")
+    octets: bytes = entier.to_bytes(taille, byteorder="big")
     
     # Initialise la liste qui contiendra les bits
     matrice_binaire: np.ndarray = np.zeros((taille, 8), dtype=int)
