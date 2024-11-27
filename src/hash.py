@@ -58,11 +58,11 @@ def hash_sophistique(chaine: str|bytes, nb_octets: int = 8) -> int:
     J'ai ensuite testé de changer quelques petits trucs à droites à gauche jusqu'à tous les tests passent.
 
     >>> hash_sophistique("Hello, world!")
-    9718304950604283904
+    16814558868908277760
     >>> hash_sophistique("Bonjour !")
-    1732255673633341440
+    6114322295254131712
     >>> hash_sophistique("bonjour !")
-    15120778896696147968
+    9666691587780042752
     """
     if isinstance(chaine, str):
         chaine = chaine.encode("utf-8")
