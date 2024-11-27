@@ -9,6 +9,7 @@ from src.utils import generer_chaines_aleatoires, digest_sha256, conversion_en_i
 def main():
     """ Précalculs (Génération de 10000 chaines random """
     chaines: list[str] = generer_chaines_aleatoires(longueur_mini=64, longueur_maxi=64, nombre_de_chaines=10000)
+    debug(f"Nombre de chaines générées: {len(chaines)}")
 
     """ Partie Astrologie (Test du Khi2, Test de rang) """
     progress("Astrologie", prefix="\n")
