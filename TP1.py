@@ -1,7 +1,7 @@
 
 # Importations
 from src.print import *
-from src.hash import hash_naif
+from src.hash import hash_naif, hash_sophistique
 from src.tests import test_khi2, test_rang
 from src.utils import generer_chaines_aleatoires, digest_sha256, conversion_en_int
 
@@ -30,6 +30,12 @@ def main():
     info(f"Test du Khi2:\t{test_khi2(collection_de_hash_naif)}")
     info(f"Test de rang:\t{test_rang(collection_de_hash_naif)}")
 
+
+    """ Partie Hash Sophistique (Test du Khi2, Test de rang) """
+    progress("Hash Sophistique", prefix="\n")
+    collection_de_hash_sophistique: list[int] = [hash_sophistique(chaine) for chaine in chaines]
+    info(f"Test du Khi2:\t{test_khi2(collection_de_hash_sophistique)}")
+    info(f"Test de rang:\t{test_rang(collection_de_hash_sophistique)}")
 
     return
 
