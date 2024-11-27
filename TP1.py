@@ -2,7 +2,7 @@
 # Importations
 from src.print import *
 from src.hash import hash_naif
-from src.tests import test_khi2, test_rang
+from src.tests import test_khi2, test_rang, test_permutation
 from src.utils import generer_chaines_aleatoires, digest_sha256, conversion_en_int
 
 @measure_time(progress)
@@ -22,6 +22,7 @@ def main():
     collection_de_sha256: list[int] = [conversion_en_int(digest_sha256(chaine)[:8]) for chaine in chaines]
     info(f"Test du Khi2:\t{test_khi2(collection_de_sha256)}")
     info(f"Test de rang:\t{test_rang(collection_de_sha256)}")
+    info(f"Test de permutation:\t{test_permutation(collection_de_sha256)}")
 
 
     """ Partie Hash Naif (Test du Khi2, Test de rang) """
@@ -29,6 +30,7 @@ def main():
     collection_de_hash_naif: list[int] = [hash_naif(chaine) for chaine in chaines]
     info(f"Test du Khi2:\t{test_khi2(collection_de_hash_naif)}")
     info(f"Test de rang:\t{test_rang(collection_de_hash_naif)}")
+    info(f"Test de permutation:\t{test_permutation(collection_de_hash_naif)}")
 
 
     return
