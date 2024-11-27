@@ -1,6 +1,7 @@
 
 # Importations
 from src.print import *
+from src.constantes import *
 
 # Fonctions
 def hash_naif(chaine: str|bytes, nb_octets: int = 8) -> int:
@@ -69,16 +70,10 @@ def hash_sophistique(chaine: str|bytes, nb_octets: int = 8) -> int:
     # On calcule un hash très simple qui va servir de base pour le hash sophistiqué
     hash_simple: int = sum(chaine)
 
-    # Les 100 premières décimales de PI, on prend un index de départ en fonction du hash simple
-    PI_STR: str = "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679"
-    PI: float = float(PI_STR)
-    DECIMALES_PI: list[int] = [int(caractere) for caractere in PI_STR[2:] if caractere.isdigit()]
+    # Les 100 premières décimales de PI (voir constantes.py), on prend un index de départ en fonction du hash simple
     index_de_pi: int = hash_simple % len(DECIMALES_PI)
 
-    # Les 100 premières décimales du nombre d'or, on prend un index de départ en fonction du hash simple (au carré)
-    PHI_STR: str = "1.6180339887498948482045868343656381177203091798057628621354486227573744944837797623400665018323050633"
-    PHI: float = float(PHI_STR)
-    DECIMALES_PHI: list[int] = [int(caractere) for caractere in PHI_STR[2:] if caractere.isdigit()]
+    # Les 100 premières décimales du nombre d'or (voir constantes.py), on prend un index de départ en fonction du hash simple (au carré)
     index_de_phi: int = (hash_simple**2) % len(DECIMALES_PHI)
 
     # à ce stade, on a deux index qui déterminent quelle décimale de PI et de PHI on va utiliser
@@ -104,3 +99,4 @@ def hash_sophistique(chaine: str|bytes, nb_octets: int = 8) -> int:
         index_de_phi = 31*(index_de_phi + decimale_de_pi + octet) % len(DECIMALES_PHI)
     
     return sortie
+

@@ -15,6 +15,7 @@ def main():
     effectifs: list[int] = [97, 93, 88, 81, 76, 73, 71, 66, 65, 64, 64, 58]
     info(f"Test du Khi2:\t{test_khi2(effectifs)}")
     info(f"Test de rang:\t{test_rang(effectifs)}")
+    info(f"Test de permutation:\t{test_permutation(effectifs)}")
 
 
     """ Partie SHA256 (Test du Khi2, Test de rang) """
