@@ -7,6 +7,7 @@ from src.utils import transformer_en_binaire
 from scipy.stats import chisquare
 from typing import Iterable
 import numpy as np
+import itertools
 
 
 # Fonctions
@@ -93,4 +94,36 @@ def test_rang(list_hash_binaire: Iterable[int]) -> tuple[bool, float, list[int]]
     # Test du Khi2
     test_khi2: tuple[float, float] = chisquare(rangs_normalises, EXP_RANG)
     return test_khi2.pvalue > 0.05, test_khi2.pvalue, rangs
+
+def test_permutation(list_hash_binaire: Iterable[int]):
+    # Assertions
+    assert all(isinstance(hash, int) for hash in list_hash_binaire), "Tous les hash à tester doivent être des entiers"
+    assert len(list_hash_binaire) > 0, "La liste de hash à tester ne peut être vide"
+
+    #recherche du nombre le plus petit parmi les hash car on ne peut comparer les rangs que si ils sont de même longueur
+    nb = min(len(str(hash)) for hash in list_hash_binaire)
+    nb = min(nb, LIMIT_TAILLE_PERMUTATION)
+
+    #tableau de toutes les permmutations possibles
+    permutations = list(itertools.permutations(range(nb), nb))
+    #dictionnaire des effectifs de toutes les permutations possibles
+    ordre_effectifs = {key:0 for key in permutations}
+
+    #pour chaque hash, on regarde l'ordre des rangs des chiffres
+    for hash in list_hash_binaire:
+        #séparer chaque chiffre du nombre 
+        sep = [int(chiffre) for chiffre in str(hash)]
+        #ne prendre que les nb derniers indices  
+        sep = sep[-nb:]
+        #regarder les rangs de chaque chiffre
+        rangs = np.argsort(np.argsort(sep))
+        #on incremente l'effectif de l'ordre de rangs
+        ordre_effectifs[tuple(rangs)] +=1
+    #on normalise les effectifs
+    effectifs_normalises = [value/len(list_hash_binaire) for value in ordre_effectifs.values()]
+    #on calcule le test du khi2
+    khi2 = test_khi2(effectifs_normalises)
+    return khi2
+
+
 
