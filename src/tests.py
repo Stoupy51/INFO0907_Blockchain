@@ -10,35 +10,35 @@ import numpy as np
 import itertools
 import math
 
-
-# Fonctions
-@handle_error((NotImplementedError,), error_log=0)
 def test_frequence(observations: Iterable[int]) -> bool:
-    """ Test de la fréquence d'une valeur donnée (f=p+-√n)
+    """ Test de la fréquence d'une valeur donnée (f=p+-(1/√n))
 
     Args:
         observations (Iterable[int]): Distribution observée
     Returns:
         bool: True si le test passe, False sinon
     
-    # >>> test_frequence([10, 20, 30])
-    # False
-    # >>> test_frequence([10, 10, 10])
-    # True
+    >>> test_frequence([1, 1000000])
+    False
+    >>> test_frequence([10, 10, 10])
+    True
     """
     # Assertions
     assert len(observations) > 0, "La distribution observée ne peut être vide"
-    somme: int = sum(observations)
-    observations = [x/somme for x in observations]
 
-    # Calcul de la fréquence et de l'erreur standard
-    frequence: float = sum(observations) / len(observations)
-    erreur_standard: float = 1 / math.sqrt(len(observations))
-
-    # On comprend pas pour le moment
-    raise NotImplementedError("Nous pas comprendre")
-
-
+    # Calcul des fréquences observées
+    n: int = sum(observations)
+    observations = [x/n for x in observations]
+    
+    #les probabilités qqu'on devrait avoir (égales pour tout le monde)
+    p = 1/len(observations)
+    # l'erreur qu'on accepte +- 1/sqrt(n)
+    erreur_standard = 1 / math.sqrt(n)
+    # Est ce que la frequence observée est égale à la fréquence attendu + ou - 1/sqrt(n)
+    for freq in observations:
+        if not (p - erreur_standard <= freq <= p + erreur_standard):
+            return False
+    return True
 
 def test_khi2(observations: Iterable[int], esperance: Iterable[int] = [], normaliser: bool = True) -> tuple[bool, float, float]:
     """ Teste le Khi2 entre deux distributions et retourne le résultat.\n
