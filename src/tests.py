@@ -8,9 +8,38 @@ from scipy.stats import chisquare
 from typing import Iterable
 import numpy as np
 import itertools
+import math
 
 
 # Fonctions
+@handle_error((NotImplementedError,), error_log=0)
+def test_frequence(observations: Iterable[int]) -> bool:
+    """ Test de la fréquence d'une valeur donnée (f=p+-√n)
+
+    Args:
+        observations (Iterable[int]): Distribution observée
+    Returns:
+        bool: True si le test passe, False sinon
+    
+    # >>> test_frequence([10, 20, 30])
+    # False
+    # >>> test_frequence([10, 10, 10])
+    # True
+    """
+    # Assertions
+    assert len(observations) > 0, "La distribution observée ne peut être vide"
+    somme: int = sum(observations)
+    observations = [x/somme for x in observations]
+
+    # Calcul de la fréquence et de l'erreur standard
+    frequence: float = sum(observations) / len(observations)
+    erreur_standard: float = 1 / math.sqrt(len(observations))
+
+    # On comprend pas pour le moment
+    raise NotImplementedError("Nous pas comprendre")
+
+
+
 def test_khi2(observations: Iterable[int], esperance: Iterable[int] = [], normaliser: bool = True) -> tuple[bool, float, float]:
     """ Teste le Khi2 entre deux distributions et retourne le résultat.\n
     Le test est passé si la pvalue est supérieure à KHI2_ALPHA (voir src/constantes.py)\n
@@ -64,11 +93,11 @@ def test_khi2(observations: Iterable[int], esperance: Iterable[int] = [], normal
     return khi2.pvalue > (1 - KHI2_ALPHA), khi2.statistic, khi2.pvalue
 
 
-def test_rang(list_hash_binaire: Iterable[int]) -> tuple[bool, float, list[int]]:
+def test_rang(observations: Iterable[int]) -> tuple[bool, float, list[int]]:
     """ Teste le rang entre une distribution observée et une distribution uniforme et retourne le résultat.
 
     Args:
-        list_hash_binaire (Iterable[int]): Distribution observée, chaque élément doit être un entier plus petit que 2**64
+        observations (Iterable[int]): Distribution observée, chaque élément doit être un entier plus petit que 2**64
     Returns:
         bool:      True si le test passe, False sinon
         float:     pvalue du test
@@ -90,31 +119,31 @@ def test_rang(list_hash_binaire: Iterable[int]) -> tuple[bool, float, list[int]]
     AssertionError: Tous les éléments de la distribution observée doivent être des entiers plus petits que 2**64
     """
     # Assertions
-    assert all(isinstance(hash, int) for hash in list_hash_binaire), "Tous les éléments de la distribution observée doivent être des entiers"
-    assert all(hash < TWO_POWER_64 for hash in list_hash_binaire), "Tous les éléments de la distribution observée doivent être des entiers plus petits que 2**64"
+    assert all(isinstance(hash, int) for hash in observations), "Tous les éléments de la distribution observée doivent être des entiers"
+    assert all(hash < TWO_POWER_64 for hash in observations), "Tous les éléments de la distribution observée doivent être des entiers plus petits que 2**64"
 
     # Initialisation des effectifs des rangs à 0
     rangs: list[int] = [0] * len(EXP_RANG)
 
     # Pour chaque hash, on transforme en binaire, on calcule le rang et on incrémente l'effectif du rang
-    for hash in list_hash_binaire:
+    for hash in observations:
         matrice_binaire: np.ndarray = transformer_en_binaire(hash)
         rang: int = rangF2(matrice_binaire)
         rangs[rang] += 1
 
     # Normalisation des effectifs (pour avoir des probas)
-    rangs_normalises: list[float] = [i/len(list_hash_binaire) for i in rangs]
+    rangs_normalises: list[float] = [i/len(observations) for i in rangs]
 
     # Test du Khi2
     test_khi2: tuple[float, float] = chisquare(rangs_normalises, EXP_RANG)
     return test_khi2.pvalue > (1 - KHI2_ALPHA), test_khi2.pvalue, rangs
 
 
-def test_permutation(list_hash_binaire: Iterable[int]) -> tuple[bool, float, float]:
+def test_permutation(observations: Iterable[int]) -> tuple[bool, float, float]:
     """ Teste si la distribution des permutations des chiffres des hash suit une loi uniforme.
 
     Args:
-        list_hash_binaire (Iterable[int]): Distribution observée, chaque élément doit être un entier
+        observations (Iterable[int]): Distribution observée, chaque élément doit être un entier
     Returns:
         bool:  True si le test passe, False sinon
         float: Statistique du test du Khi2
@@ -136,11 +165,11 @@ def test_permutation(list_hash_binaire: Iterable[int]) -> tuple[bool, float, flo
     AssertionError: Tous les hash à tester doivent être des entiers
     """
     # Assertions
-    assert all(isinstance(hash, int) for hash in list_hash_binaire), "Tous les hash à tester doivent être des entiers"
-    assert len(list_hash_binaire) > 0, "La liste de hash à tester ne peut être vide"
+    assert all(isinstance(hash, int) for hash in observations), "Tous les hash à tester doivent être des entiers"
+    assert len(observations) > 0, "La liste de hash à tester ne peut être vide"
 
     # Recherche du nombre le plus petit parmi les hash car on ne peut comparer les rangs que si ils sont de même longueur
-    nb: int = min(len(str(hash)) for hash in list_hash_binaire)
+    nb: int = min(len(str(hash)) for hash in observations)
     nb = min(nb, LIMIT_TAILLE_PERMUTATION)
 
     # Tableau de toutes les permutations possibles
@@ -150,7 +179,7 @@ def test_permutation(list_hash_binaire: Iterable[int]) -> tuple[bool, float, flo
     ordre_effectifs: dict[tuple[int], int] = {key: 0 for key in permutations}
 
     # Pour chaque hash, on regarde l'ordre des rangs des chiffres
-    for hash in list_hash_binaire:
+    for hash in observations:
  
         # Séparer chaque chiffre du nombre 
         seperation: list[int] = [int(chiffre) for chiffre in str(hash)]

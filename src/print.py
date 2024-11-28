@@ -157,7 +157,7 @@ def handle_error(exceptions: tuple[type[Exception], ...] = (Exception,), message
 					warning(f"{msg}Error during {func.__name__}:\n{traceback.format_exc()}")
 				elif error_log == 3:
 					error(f"{msg}Error during {func.__name__}:\n{traceback.format_exc()}", exit=True)
-				else:
+				elif error_log >= 4:
 					raise e
 		return wrapper
 	return decorator
