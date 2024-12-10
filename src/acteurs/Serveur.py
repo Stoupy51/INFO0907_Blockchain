@@ -4,7 +4,6 @@ from __future__ import annotations
 from src.print import *
 from src.constantes import *
 from src.acteurs.Bloc import Bloc
-from src.acteurs.utils import puissance_random
 
 # Classe
 class Serveur():
@@ -43,7 +42,7 @@ class Serveur():
             On l'accepte donc
             Il renvoie le bloc à ses voisins car il est gentil (optionnel)
         """
-        if self.blockchain[-1].hash != bloc.hash_precedent:
+        if self.blockchain and self.blockchain[-1].hash != bloc.hash_precedent:
             return
         # if not bloc.transactions: # Pas implementé
         #    return
@@ -56,6 +55,16 @@ class Serveur():
             self.diffuser(bloc)
         return
 
+    def recherche_bloc(self) -> Bloc|None:
+        """ Fonction qui recherche un bloc """
+        import random
+        if random.randint(1, 1000000) == 1:
+            if self.blockchain:
+                hash_precedent: str = self.blockchain[-1].hash
+            else:
+                hash_precedent: str = ""
+            return Bloc(hash_precedent=hash_precedent, transactions=[], date=int(time.time()))
+        return None
 
 
     # Fonctions statiques (regarde pas ;-;)

@@ -10,7 +10,7 @@ def main():
     # Création d'une liste de Serveurs
     serveurs: list[Serveur] = [Serveur(puissance_stp()) for _ in range(NB_SERVEURS)]
     for s in serveurs:
-        info(s)
+        debug(s)
     
     # Boucle infinie
     while True:
