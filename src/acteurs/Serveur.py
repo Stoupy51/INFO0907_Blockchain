@@ -58,7 +58,7 @@ class Serveur():
     def recherche_bloc(self) -> Bloc|None:
         """ Fonction qui recherche un bloc """
         import random
-        if random.randint(1, 1000000) == 1:
+        if random.randint(1, 1000000) == 1: #TODO: faire un sha et regarder le nb 0
             if self.blockchain:
                 hash_precedent: str = self.blockchain[-1].hash
             else:

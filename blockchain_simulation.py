@@ -5,12 +5,13 @@ from src.acteurs import *
 
 
 @measure_time(progress)
-@handle_error((KeyboardInterrupt,), error_log=1)
+@handle_error((KeyboardInterrupt,), error_log=0)
 def main():
     # Création d'une liste de Serveurs
     serveurs: list[Serveur] = [Serveur(puissance_stp()) for _ in range(NB_SERVEURS)]
     for s in serveurs:
         debug(s)
+    info(f"Total des puissances : {sum(s.puissance for s in serveurs)}")
     
     # Boucle infinie
     while True:

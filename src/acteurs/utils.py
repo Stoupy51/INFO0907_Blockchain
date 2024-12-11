@@ -35,6 +35,12 @@ def selection_serveur_aleatoire(serveurs: list[Serveur]) -> Serveur:
 
 
 def puissance_stp(la_range: tuple[int, int, int] = PUISSANCE_RANGE) -> int:
-    """ Renvoie (gentiment) une puissance """
-    return 0
+    """ Renvoie (gentiment) une puissance\n
+    Args:
+        la_range (tuple[int, int, int]): Tuple contenant (min, max, pas)
+    Returns:
+        int: Une puissance aléatoire dans l'intervalle [min, max] avec le pas
+    """
+    mini, maxi, pas = la_range
+    return random.randrange(mini, maxi + 1, pas)    # max+1 car exclusif
 
