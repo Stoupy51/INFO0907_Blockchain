@@ -18,7 +18,7 @@ class Bloc():
     def hash() -> int:
         return 1
     
-    def est_valide() -> bool:
+    def est_valide(self) -> bool:
         pass
 
 
