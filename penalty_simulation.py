@@ -31,13 +31,13 @@ def simulation(boucle: int, gardien: Joueur, tireur: Joueur) -> tuple[int,int]:
 
 
 @measure_time(progress)
-@handle_error((KeyboardInterrupt,), error_log=1)
+@handle_error((KeyboardInterrupt,), error_log=0)
 def main():
     # On initialise les joueurs
-    alpha: float = 0.80
-    beta: float = 0.40
-    alpha: float = 2/7
-    beta: float = 4/7
+    alpha: float = 0.70
+    beta: float = 0.70
+    #alpha: float = 2/7
+    #beta: float = 4/7
     gardien = Joueur(proba=alpha)
     tireur = Joueur(proba=beta)
 
@@ -47,23 +47,30 @@ def main():
 
     # Boucle infinie
     import time
-    for _ in range(nb_etapes):
+    for i in range(nb_etapes):
+        if i%666 == 0:
+            progress(f"{(i/nb_etapes)*100:.2f}%")
+            info(f"Alpha = {gardien.proba:.3f},\tBeta = {tireur.proba:.3f}")
         #time.sleep(1)
 
-        total_gardien, total_tireur = simulation(1000, gardien, tireur)
+        total_gardien, total_tireur = simulation(10000, gardien, tireur)
         gardien.adapter(total_gardien)
         alpha_historique.append(gardien.proba)
 
-        total_gardien, total_tireur = simulation(1000, gardien, tireur)
+        total_gardien, total_tireur = simulation(10000, gardien, tireur)
         tireur.adapter(total_tireur)        
-        info(f"Alpha = {gardien.proba:.3f},\tBeta = {tireur.proba:.3f}")
+        #info(f"Alpha = {gardien.proba:.3f},\tBeta = {tireur.proba:.3f}")
         beta_historique.append(tireur.proba)
 
     #construction graphique
     import matplotlib.pyplot as plt
-    plt.plot(alpha_historique, label="Alpha")
-    plt.plot(beta_historique, label="Beta")
-    plt.legend()
+    # Calcul de l'opacité (plus un point est vieux, plus il est transparent)
+    opacite = [0.1 + 0.9 * i/len(beta_historique) for i in range(len(beta_historique))]
+    plt.scatter(beta_historique, alpha_historique, s=1, alpha=opacite)
+    plt.xlabel("Beta") 
+    plt.ylabel("Alpha")
+    plt.xlim(0, 1)
+    plt.ylim(0, 1)
     plt.savefig("graphique.png")
     
     return
