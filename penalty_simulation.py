@@ -4,6 +4,7 @@ from src.print import *
 from src.joueur_penalty import *
 import matplotlib.pyplot as plt
 import random
+import time
 
 # On initialise l1 et l2 (les scores pour chaque cas)
 l1: list[int] = [4, 7, 9, 5]
@@ -47,7 +48,6 @@ def main():
     beta_historique: list = []
 
     # Boucle infinie
-    import time
     for i in range(nb_etapes):
         if i%666 == 0:
             progress(f"{(i/nb_etapes)*100:.2f}% (Alpha={gardien.proba:.3f},\tBeta={tireur.proba:.3f})")
