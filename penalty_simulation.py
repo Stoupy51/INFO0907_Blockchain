@@ -2,6 +2,7 @@
 # Importations
 from src.print import *
 from src.joueur_penalty import *
+import matplotlib.pyplot as plt
 import random
 
 # On initialise l1 et l2 (les scores pour chaque cas)
@@ -49,8 +50,7 @@ def main():
     import time
     for i in range(nb_etapes):
         if i%666 == 0:
-            progress(f"{(i/nb_etapes)*100:.2f}%")
-            info(f"Alpha = {gardien.proba:.3f},\tBeta = {tireur.proba:.3f}")
+            progress(f"{(i/nb_etapes)*100:.2f}% (Alpha={gardien.proba:.3f},\tBeta={tireur.proba:.3f})")
         #time.sleep(1)
 
         total_gardien, total_tireur = simulation(10000, gardien, tireur)
@@ -62,8 +62,7 @@ def main():
         #info(f"Alpha = {gardien.proba:.3f},\tBeta = {tireur.proba:.3f}")
         beta_historique.append(tireur.proba)
 
-    #construction graphique
-    import matplotlib.pyplot as plt
+    # Construction graphique
     # Calcul de l'opacité (plus un point est vieux, plus il est transparent)
     opacite = [0.1 + 0.9 * i/len(beta_historique) for i in range(len(beta_historique))]
     plt.scatter(beta_historique, alpha_historique, s=1, alpha=opacite)

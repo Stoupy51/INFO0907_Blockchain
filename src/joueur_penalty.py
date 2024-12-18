@@ -1,5 +1,5 @@
 
-PAS = 0.02
+PAS = 0.01
 
 class Joueur:
     """
