@@ -2,7 +2,7 @@
 # Importations
 from __future__ import annotations
 from src.print import *
-from src.constantes import *
+from src.acteurs.config import *
 from src.acteurs.Bloc import Bloc
 
 # Classe
@@ -36,16 +36,20 @@ class Serveur():
 
         Étapes:
             Vérifie le hash précédent
+            Calcul du hash du bloc. Si commence par NB*0, le bloc est bon
             Vérifie la transaction (NotImplemented pour le moment)
-            Calcul du hash du bloc
-            Si commence par NB*0, le bloc est bon
             On l'accepte donc
             Il renvoie le bloc à ses voisins car il est gentil (optionnel)
         """
-        if self.blockchain and self.blockchain[-1].hash != bloc.hash_precedent:
+        # On vérifie le hash précédent
+        if self.blockchain and self.blockchain[-1].hash() != bloc.hash_precedent:
             return
+
+        # On vérifie la liste de transactions
         # if not bloc.transactions: # Pas implementé
         #    return
+
+        # On vérifie si le hash du bloc est valide
         if not bloc.est_valide():
             return
         
@@ -57,13 +61,13 @@ class Serveur():
 
     def recherche_bloc(self) -> Bloc|None:
         """ Fonction qui recherche un bloc """
-        import random
-        if random.randint(1, 1000000) == 1: #TODO: faire un sha et regarder le nb 0
-            if self.blockchain:
-                hash_precedent: str = self.blockchain[-1].hash
-            else:
-                hash_precedent: str = ""
-            return Bloc(hash_precedent=hash_precedent, transactions=[], date=int(time.time()))
+        bloc = Bloc(
+            hash_precedent=self.blockchain[-1].hash() if self.blockchain else None, 
+            transactions=self.transactions_a_inserer,
+            date=int(time.time())
+        )
+        if bloc.est_valide():
+            return bloc
         return None
 
 

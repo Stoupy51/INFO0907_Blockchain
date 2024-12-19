@@ -3,6 +3,11 @@
 from src.print import *
 from src.acteurs import *
 
+# TODO:
+# - hash du bloc: 
+# - est valide : calculer le hash et verifier qu'il commence par NB * 0
+
+
 
 @measure_time(progress)
 @handle_error((KeyboardInterrupt,), error_log=0)
