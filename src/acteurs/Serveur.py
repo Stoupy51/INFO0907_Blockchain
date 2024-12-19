@@ -8,7 +8,7 @@ from src.acteurs.Bloc import Bloc
 # Classe
 class Serveur():
     """ Classe serveur """
-    __prochain_id: int = 0
+    __prochain_id: int = 1
 
     # Fonctions de base
     def __init__(self, puissance: int):
@@ -17,11 +17,24 @@ class Serveur():
         self.transactions_a_inserer: list[str] = []
         self.puissance: int = puissance
         self.voisins: list[Serveur] = []
+        self.tricheur: bool = False
     
     def __str__(self):
-        return f"Serveur #{self.id}, {len(self.blockchain)=}, {self.puissance=}"
+        return f"Server #{self.id}, nb_blocks={len(self.blockchain)}, puissance={self.puissance}"
+    
+    def afficher_blockchain(self, limit: int = 5) -> str:
+        # Début du message
+        long: int = len(self.blockchain)
+        message: str = f"Longueur de la blockchain: {long}"
 
+        # On ajoute pour chaque bloc son affichage
+        borne_inferieur: int = max(0, long - limit)
+        for i in range(borne_inferieur, long):
+            message += f"\n#{i+1}: {self.blockchain[i]}"
 
+        # Affichage du message
+        progress(message)
+    
     # Fonctions spécifiques à la classe
     def diffuser(self, message) -> None:
         for voisin in self.voisins:
@@ -67,6 +80,7 @@ class Serveur():
             date=int(time.time())
         )
         if bloc.est_valide():
+            self.blockchain.append(bloc)
             return bloc
         return None
 
@@ -78,6 +92,5 @@ class Serveur():
         identifiant: int = Serveur.__prochain_id
         Serveur.__prochain_id += 1
         return identifiant
-
 
 

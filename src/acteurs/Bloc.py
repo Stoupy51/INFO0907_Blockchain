@@ -7,17 +7,6 @@ from src.utils import conversion_en_int, conversion_int_en_bytes
 from hashlib import sha256
 import random
 
-"""
-from hashlib import sha256
-cle1: sha256 = sha256(MSG1.encode("utf-8"))
-cle2: sha256 = sha256(MSG2.encode("utf-8"))
-resultat1: bytes = cle1.digest()
-resultat2: bytes = cle2.digest()
-
-# Affiche le hachage hex des messages
-hachage_msg2_hex: str = "".join(f"{b:02X}" for b in resultat2)
-info(f"Message 1: {hachage_msg1_hex}")
-"""
 
 # Classe Bloc
 class Bloc():
@@ -28,6 +17,9 @@ class Bloc():
         self.transactions: list[str] = transactions
         self.date: int = date
         self.nonce: int = random.randint(0, NONCE_MAX)
+    
+    def __str__(self) -> str:
+        return "".join(f"{b:02X}" for b in conversion_int_en_bytes(self.hash(), longueur=32))
 
     def hash(self) -> int:
         """ Calcul du hash tu bloc à partir de tous ses éléments concaténé en string, puis calcul d'un sha256 """
@@ -41,7 +33,7 @@ class Bloc():
     def est_valide(self) -> bool:
         """ Regarde si c'est valide """
         # On récupère le hash en hexadécimal
-        octets: bytes = conversion_int_en_bytes(self.hash(), longueur=32)
+        octets: bytes = conversion_int_en_bytes(self.hash(), longueur=32)   # 32 octets pour 256 bits
         hex: str = "".join(f"{b:02X}" for b in octets)
 
         # True si il commence avec le nombre approprié de 0

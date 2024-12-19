@@ -44,3 +44,17 @@ def puissance_stp(la_range: tuple[int, int, int] = PUISSANCE_RANGE) -> int:
     mini, maxi, pas = la_range
     return random.randrange(mini, maxi + 1, pas)    # max+1 car exclusif
 
+
+def nouvelle_simulation(nb_serveurs: int = 10, la_range: tuple[int, int, int] = PUISSANCE_RANGE) -> list[Serveur]:
+    """ Fonction qui créée une simulation
+
+    Args:
+        nb_serveurs (int):   Nombre de serveurs à créer
+        la_range    (tuple): La plage de puissance à utiliser
+    Returns:
+        list[Serveur]:   La liste des serveurs créés
+    """
+    from src.acteurs.utils import puissance_stp
+    
+    Serveur.__prochain_id = 1
+    return [Serveur(puissance_stp(la_range)) for _ in range(nb_serveurs)]
