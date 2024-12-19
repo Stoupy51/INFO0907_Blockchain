@@ -5,3 +5,5 @@ __pycache__
 # Lock file
 *lock.*
 
+# zip
+*.zip
