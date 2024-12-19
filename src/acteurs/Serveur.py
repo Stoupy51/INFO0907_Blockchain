@@ -20,7 +20,7 @@ class Serveur():
         self.tricheur: bool = False
     
     def __str__(self):
-        return f"Server #{self.id}, nb_blocks={len(self.blockchain)}, puissance={self.puissance}"
+        return f"Server #{self.id:02d}, nb_blocks={len(self.blockchain)}, puissance={self.puissance}"
     
     def afficher_blockchain(self, limit: int = 5) -> str:
         # Début du message
