@@ -123,7 +123,7 @@ def main():
     plt.ylabel("Nombre de blocs")
     
     plt.tight_layout()
-    plt.show()
+    plt.savefig('simulation_results_1.png')
     
     print(result_1)
 
