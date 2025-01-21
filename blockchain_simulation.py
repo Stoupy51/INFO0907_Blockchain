@@ -68,7 +68,7 @@ def simulation(
                     break
 
     # On analyse les résultats
-    blockchains = [s.blockchain[-1].hash if s.blockchain else None for s in serveurs]
+    blockchains = [s.blockchain[-1].hash() if s.blockchain else None for s in serveurs]
     repartition = Counter(blockchains)
     taille_max = max(len(s.blockchain) for s in serveurs)
                 
