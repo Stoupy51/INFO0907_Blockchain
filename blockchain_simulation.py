@@ -36,6 +36,7 @@ def simulation(
             - puissance_totale: Somme des puissances de calcul
             - repartition: Répartition des serveurs par blockchain
             - historique: Liste des métriques au fil du temps
+            - blocs_par_serveur: Nombre de blocs trouvés par chaque serveur
     """
     for s in serveurs:
         debug(s)
@@ -50,6 +51,9 @@ def simulation(
     }
     temps = 0
     
+    # Pour compter les blocs trouvés par serveur
+    blocs_par_serveur = {i: 0 for i in range(len(serveurs))}
+    
     # Boucle infinie
     while True:
         temps += 1
@@ -62,6 +66,9 @@ def simulation(
 
         # Si trouvé, on l'envoie à tout le monde
         if bloc:
+            # On incrémente le compteur pour ce serveur
+            blocs_par_serveur[serveurs.index(choisi)] += 1
+            
             info(f"[{choisi}] Bloc trouvé et envoyé !")
  
             # TODO Affichage de debug qui est en plein milieu il a rien demandé le pauvre
@@ -81,7 +88,7 @@ def simulation(
             
             # Si un des serveurs a plus de 50 blocs, alors stopper
             if condition_darret == ConditionsDarret.PLUS_DE_50_BLOCS:
-                if len(s.blockchain) > 50:
+                if len(s.blockchain) >= 50:
                     break
 
     # On analyse les résultats
@@ -95,8 +102,50 @@ def simulation(
         "taille_max": taille_max,
         "puissance_totale": puissance_totale,
         "repartition": dict(repartition),
-        "historique": historique
+        "historique": historique,
+        "blocs_par_serveur": blocs_par_serveur
     }
+
+
+def plot_simulation_results(result: dict, filename: str):
+    """Trace les graphiques des résultats de simulation et les sauvegarde
+
+    Args:
+        result (dict): Résultats de la simulation
+        filename (str): Nom du fichier pour sauvegarder les graphiques
+    """
+    historique = result.pop("historique")
+    print(result)
+    
+    plt.figure(figsize=(15,10))
+    
+    plt.subplot(231)
+    plt.plot(historique["temps"], historique["nb_blockchains"])
+    plt.title("Évolution du nombre de blockchains")
+    plt.xlabel("Temps")
+    plt.ylabel("Nombre de blockchains")
+    
+    plt.subplot(232)
+    plt.plot(historique["temps"], historique["taille_max"])
+    plt.title("Évolution de la taille maximale")
+    plt.xlabel("Temps") 
+    plt.ylabel("Nombre de blocs")
+    
+    plt.subplot(233)
+    repartition_values = list(result["repartition"].values())
+    plt.pie(repartition_values, autopct='%1.1f%%')
+    plt.title("Répartition des blockchains")
+    
+    plt.subplot(234)
+    serveurs_indices = list(result["blocs_par_serveur"].keys())
+    blocs_trouves = list(result["blocs_par_serveur"].values())
+    plt.bar(serveurs_indices, blocs_trouves)
+    plt.title("Nombre de blocs trouvés par serveur")
+    plt.xlabel("Numéro du serveur")
+    plt.ylabel("Nombre de blocs trouvés")
+    
+    plt.tight_layout()
+    plt.savefig(filename)
 
 
 @measure_time(progress)
@@ -106,26 +155,7 @@ def main():
     NB_SERVEURS: int = 10
     serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS)
     result_1: dict = simulation(serveurs)
-    
-    # Tracer les courbes
-    plt.figure(figsize=(12,6))
-    
-    plt.subplot(121)
-    plt.plot(result_1["historique"]["temps"], result_1["historique"]["nb_blockchains"])
-    plt.title("Évolution du nombre de blockchains")
-    plt.xlabel("Temps")
-    plt.ylabel("Nombre de blockchains")
-    
-    plt.subplot(122)
-    plt.plot(result_1["historique"]["temps"], result_1["historique"]["taille_max"])
-    plt.title("Évolution de la taille maximale")
-    plt.xlabel("Temps") 
-    plt.ylabel("Nombre de blocs")
-    
-    plt.tight_layout()
-    plt.savefig('simulation_results_1.png')
-    
-    print(result_1)
+    plot_simulation_results(result_1, 'simulation_results_1.png')
 
 
 if __name__ == "__main__":
