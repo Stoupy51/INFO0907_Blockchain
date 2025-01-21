@@ -3,6 +3,7 @@
 from src.print import *
 from src.acteurs import *
 from enum import Enum
+from collections import Counter
 
 # A FAIRE: 
 # introduire des tricheurs 
@@ -28,11 +29,16 @@ def simulation(
         serveurs            (list[Serveur]):    Liste des serveurs à utiliser
         condition_darret    (ConditionsDarret): Condition d'arrêt à utiliser
     Returns:
-        dict: Rien pour le moment
+        dict: Métriques de la simulation:
+            - nb_blockchains: Nombre de blockchains différentes à la fin
+            - taille_max: Taille de la plus longue blockchain
+            - puissance_totale: Somme des puissances de calcul
+            - repartition: Répartition des serveurs par blockchain
     """
     for s in serveurs:
         debug(s)
-    info(f"Total des puissances : {sum(s.puissance for s in serveurs)}")
+    puissance_totale = sum(s.puissance for s in serveurs)
+    info(f"Total des puissances : {puissance_totale}")
     
     # Boucle infinie
     while True:
@@ -60,9 +66,19 @@ def simulation(
             if condition_darret == ConditionsDarret.PLUS_DE_50_BLOCS:
                 if len(s.blockchain) > 50:
                     break
+
+    # On analyse les résultats
+    blockchains = [s.blockchain[-1].hash if s.blockchain else None for s in serveurs]
+    repartition = Counter(blockchains)
+    taille_max = max(len(s.blockchain) for s in serveurs)
                 
-    # On retourne les métriques (bidons pour le moment)
-    return {"rien":"A FAIRE: une mesure de quelque chose"}
+    # On retourne les métriques
+    return {
+        "nb_blockchains": len(repartition),
+        "taille_max": taille_max,
+        "puissance_totale": puissance_totale,
+        "repartition": dict(repartition)
+    }
 
 
 @measure_time(progress)
