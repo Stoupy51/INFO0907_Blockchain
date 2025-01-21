@@ -1,4 +1,3 @@
-
 # Importations
 from src.print import *
 from src.acteurs import *
@@ -31,10 +30,9 @@ def simulation(
         condition_darret    (ConditionsDarret): Condition d'arrêt à utiliser
     Returns:
         dict: Métriques de la simulation:
-            - nb_blockchains: Nombre de blockchains différentes à la fin
+            - blockchains: Dictionnaire associant à chaque hash de blockchain sa taille, si elle vient d'un tricheur et le nombre de serveurs l'utilisant
             - taille_max: Taille de la plus longue blockchain
             - puissance_totale: Somme des puissances de calcul
-            - repartition: Répartition des serveurs par blockchain
             - historique: Liste des métriques au fil du temps
             - blocs_par_serveur: Nombre de blocs trouvés par chaque serveur
     """
@@ -45,7 +43,7 @@ def simulation(
     
     # Pour tracer les courbes
     historique = {
-        "nb_blockchains": [],
+        "blockchains": [],  # Liste de dictionnaires {hash: {"taille": n, "tricheur": bool}}
         "taille_max": [],
         "temps": []
     }
@@ -71,37 +69,54 @@ def simulation(
             
             info(f"[{choisi}] Bloc trouvé et envoyé !")
  
-            # TODO Affichage de debug qui est en plein milieu il a rien demandé le pauvre
-            if choisi is serveurs[0]:
-                choisi.afficher_blockchain()
- 
             # On diffuse le message comme quoi el nouvel bloc a été trouvé
             for s in serveurs:
                 if s is not choisi:
                     s.recevoir(bloc)
             
             # Mise à jour des métriques pour les courbes
-            blockchains = [s.blockchain[-1].hash() if s.blockchain else None for s in serveurs]
-            historique["nb_blockchains"].append(len(set(blockchains)))
+            blockchains_dict = {}
+            for s in serveurs:
+                if s.blockchain:
+                    hash_blockchain = s.blockchain[-1].hash()
+                    if hash_blockchain not in blockchains_dict:
+                        blockchains_dict[hash_blockchain] = {
+                            "taille": len(s.blockchain),
+                            "tricheur": s.tricheur,
+                            "nb_serveurs": 1
+                        }
+                    else:
+                        blockchains_dict[hash_blockchain]["nb_serveurs"] += 1
+            historique["blockchains"].append(blockchains_dict)
             historique["taille_max"].append(max(len(s.blockchain) for s in serveurs))
             historique["temps"].append(temps)
             
             # Si un des serveurs a plus de 50 blocs, alors stopper
             if condition_darret == ConditionsDarret.PLUS_DE_50_BLOCS:
-                if len(s.blockchain) >= 50:
+                if len(choisi.blockchain) >= 50:
                     break
 
     # On analyse les résultats
-    blockchains = [s.blockchain[-1].hash() if s.blockchain else None for s in serveurs]
-    repartition = Counter(blockchains)
+    blockchains_dict = {}
+    for s in serveurs:
+        if s.blockchain:
+            hash_blockchain = s.blockchain[-1].hash()
+            if hash_blockchain not in blockchains_dict:
+                blockchains_dict[hash_blockchain] = {
+                    "taille": len(s.blockchain),
+                    "tricheur": s.tricheur,
+                    "nb_serveurs": 1
+                }
+            else:
+                blockchains_dict[hash_blockchain]["nb_serveurs"] += 1
+    
     taille_max = max(len(s.blockchain) for s in serveurs)
                 
     # On retourne les métriques
     return {
-        "nb_blockchains": len(repartition),
+        "blockchains": blockchains_dict,
         "taille_max": taille_max,
         "puissance_totale": puissance_totale,
-        "repartition": dict(repartition),
         "historique": historique,
         "blocs_par_serveur": blocs_par_serveur
     }
@@ -117,45 +132,70 @@ def plot_simulation_results(result: dict, filename: str):
     historique = result.pop("historique")
     print(result)
     
-    plt.figure(figsize=(15,10))
-    
-    plt.subplot(231)
-    plt.plot(historique["temps"], historique["nb_blockchains"])
-    plt.title("Évolution du nombre de blockchains")
-    plt.xlabel("Temps")
-    plt.ylabel("Nombre de blockchains")
-    
-    plt.subplot(232)
-    plt.plot(historique["temps"], historique["taille_max"])
-    plt.title("Évolution de la taille maximale")
-    plt.xlabel("Temps") 
-    plt.ylabel("Nombre de blocs")
-    
-    plt.subplot(233)
-    repartition_values = list(result["repartition"].values())
-    plt.pie(repartition_values, autopct='%1.1f%%')
-    plt.title("Répartition des blockchains")
-    
-    plt.subplot(234)
-    serveurs_indices = list(result["blocs_par_serveur"].keys())
-    blocs_trouves = list(result["blocs_par_serveur"].values())
-    plt.bar(serveurs_indices, blocs_trouves)
-    plt.title("Nombre de blocs trouvés par serveur")
-    plt.xlabel("Numéro du serveur")
-    plt.ylabel("Nombre de blocs trouvés")
-    
-    plt.tight_layout()
-    plt.savefig(filename)
+    try:
+        plt.figure(figsize=(15,10))
+        
+        plt.subplot(221)
+        plt.plot(historique["temps"], [len(bc) for bc in historique["blockchains"]])
+        plt.title("Évolution du nombre de blockchains")
+        plt.xlabel("Temps")
+        plt.ylabel("Nombre de blockchains")
+        
+        plt.subplot(222)
+        plt.plot(historique["temps"], historique["taille_max"])
+        plt.title("Évolution de la taille maximale")
+        plt.xlabel("Temps") 
+        plt.ylabel("Nombre de blocs")
+        
+        plt.subplot(223)
+        # Séparer les blockchains honnêtes et malveillantes
+        honnetes = []
+        malveillantes = []
+        for hash_bc, info in result["blockchains"].items():
+            if info["tricheur"]:
+                malveillantes.extend([info["taille"]] * info["nb_serveurs"])
+            else:
+                honnetes.extend([info["taille"]] * info["nb_serveurs"])
+                
+        labels = ['Honnêtes', 'Malveillantes'] if malveillantes else ['Honnêtes']
+        sizes = [sum(honnetes), sum(malveillantes)] if malveillantes else [sum(honnetes)]
+        plt.pie(sizes, labels=labels, autopct='%1.1f%%')
+        plt.title("Répartition des blockchains honnêtes/malveillantes")
+        
+        plt.subplot(224)
+        serveurs_indices = list(result["blocs_par_serveur"].keys())
+        blocs_trouves = list(result["blocs_par_serveur"].values())
+        plt.bar(serveurs_indices, blocs_trouves)
+        plt.title("Nombre de blocs trouvés par serveur")
+        plt.xlabel("Numéro du serveur")
+        plt.ylabel("Nombre de blocs trouvés")
+        
+        plt.tight_layout()
+        plt.savefig(filename)
+    except Exception as e:
+        warning(f"Erreur lors de la création du graphique: {e}")
 
 
 @measure_time(progress)
 @handle_error((KeyboardInterrupt,), error_log=0)
 def main():
     # Simulation n°1, la plus basique: 10 serveurs sans tricheurs, puissance de calculs aléatoire
+    print("\n\nSimulation n°1: 10 serveurs sans tricheurs\n")
     NB_SERVEURS: int = 10
     serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS)
     result_1: dict = simulation(serveurs)
     plot_simulation_results(result_1, 'simulation_results_1.png')
+
+    # Simulation n°2: ajout d'un tricheur avec une forte puissance de calcul
+    print("\n\nSimulation n°2: 10 serveurs + 1 tricheur avec 20% de la puissance totale\n")
+    NB_SERVEURS: int = 10
+    serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS - 1)  # 9 serveurs honnêtes
+    puissance_totale = sum(s.puissance for s in serveurs)
+    # On ajoute un tricheur avec une puissance de calcul élevée
+    tricheur = Serveur(puissance=20*(puissance_totale/80), tricheur=True)  # Puissance plus élevée que la normale
+    serveurs.append(tricheur)
+    result_2: dict = simulation(serveurs)
+    plot_simulation_results(result_2, 'simulation_results_2.png')
 
 
 if __name__ == "__main__":

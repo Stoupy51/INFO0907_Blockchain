@@ -1,4 +1,3 @@
-
 # Importations
 from __future__ import annotations
 from src.print import *
@@ -11,13 +10,13 @@ class Serveur():
     __prochain_id: int = 1
 
     # Fonctions de base
-    def __init__(self, puissance: int):
+    def __init__(self, puissance: int, tricheur: bool = False):
         self.id: int = Serveur.prochain_id()
         self.blockchain: list[Bloc] = []
         self.transactions_a_inserer: list[str] = []
         self.puissance: int = puissance
         self.voisins: list[Serveur] = []
-        self.tricheur: bool = False
+        self.tricheur: bool = tricheur
     
     def __str__(self):
         return f"Server #{self.id:02d}, nb_blocks={len(self.blockchain)}, puissance={self.puissance}"
@@ -54,6 +53,10 @@ class Serveur():
             On l'accepte donc
             Il renvoie le bloc à ses voisins car il est gentil (optionnel)
         """
+        # Si c'est un tricheur, il ignore les blocs des autres
+        if self.tricheur:
+            return
+
         # On vérifie le hash précédent
         if self.blockchain and self.blockchain[-1].hash() != bloc.hash_precedent:
             return
@@ -74,8 +77,11 @@ class Serveur():
 
     def recherche_bloc(self) -> Bloc|None:
         """ Fonction qui recherche un bloc """
+        # Si c'est un tricheur, il ignore le hash précédent des autres
+        hash_precedent = None if self.tricheur else (self.blockchain[-1].hash() if self.blockchain else None)
+        
         bloc = Bloc(
-            hash_precedent=self.blockchain[-1].hash() if self.blockchain else None, 
+            hash_precedent=hash_precedent,
             transactions=self.transactions_a_inserer,
             date=int(time.time())
         )
