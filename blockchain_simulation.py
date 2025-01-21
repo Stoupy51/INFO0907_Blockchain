@@ -69,10 +69,10 @@ def simulation(
             
             info(f"[{choisi}] Bloc trouvé et envoyé !")
  
-            # On diffuse le message comme quoi el nouvel bloc a été trouvé
+            # On diffuse le message comme quoi le nouvel bloc a été trouvé
             for s in serveurs:
                 if s is not choisi:
-                    s.recevoir(bloc)
+                    s.recevoir(bloc, choisi, len(choisi.blockchain))
             
             # Mise à jour des métriques pour les courbes
             blockchains_dict = {}
@@ -82,11 +82,12 @@ def simulation(
                     if hash_blockchain not in blockchains_dict:
                         blockchains_dict[hash_blockchain] = {
                             "taille": len(s.blockchain),
-                            "tricheur": s.tricheur,
-                            "nb_serveurs": 1
+                            "tricheur": False,
+                            "nb_serveurs": 0
                         }
-                    else:
-                        blockchains_dict[hash_blockchain]["nb_serveurs"] += 1
+                    if s.tricheur:
+                        blockchains_dict[hash_blockchain]["tricheur"] = True
+            blockchains_dict[hash_blockchain]["nb_serveurs"] += 1
             historique["blockchains"].append(blockchains_dict)
             historique["taille_max"].append(max(len(s.blockchain) for s in serveurs))
             historique["temps"].append(temps)
@@ -104,11 +105,12 @@ def simulation(
             if hash_blockchain not in blockchains_dict:
                 blockchains_dict[hash_blockchain] = {
                     "taille": len(s.blockchain),
-                    "tricheur": s.tricheur,
-                    "nb_serveurs": 1
+                    "tricheur": False,
+                    "nb_serveurs": 0
                 }
-            else:
-                blockchains_dict[hash_blockchain]["nb_serveurs"] += 1
+            if s.tricheur:
+                blockchains_dict[hash_blockchain]["tricheur"] = True
+            blockchains_dict[hash_blockchain]["nb_serveurs"] += 1
     
     taille_max = max(len(s.blockchain) for s in serveurs)
                 
@@ -149,16 +151,16 @@ def plot_simulation_results(result: dict, filename: str):
         
         plt.subplot(223)
         # Séparer les blockchains honnêtes et malveillantes
-        honnetes = []
-        malveillantes = []
-        for hash_bc, info in result["blockchains"].items():
+        honnetes = 0
+        malveillantes = 0
+        for info in result["blockchains"].values():
             if info["tricheur"]:
-                malveillantes.extend([info["taille"]] * info["nb_serveurs"])
+                malveillantes += 1
             else:
-                honnetes.extend([info["taille"]] * info["nb_serveurs"])
+                honnetes += 1
                 
-        labels = ['Honnêtes', 'Malveillantes'] if malveillantes else ['Honnêtes']
-        sizes = [sum(honnetes), sum(malveillantes)] if malveillantes else [sum(honnetes)]
+        labels = ['Honnêtes', 'Malveillantes'] if malveillantes > 0 else ['Honnêtes']
+        sizes = [honnetes, malveillantes] if malveillantes > 0 else [honnetes]
         plt.pie(sizes, labels=labels, autopct='%1.1f%%')
         plt.title("Répartition des blockchains honnêtes/malveillantes")
         
@@ -171,6 +173,7 @@ def plot_simulation_results(result: dict, filename: str):
         plt.ylabel("Nombre de blocs trouvés")
         
         plt.tight_layout()
+        #plt.show()
         plt.savefig(filename)
     except Exception as e:
         warning(f"Erreur lors de la création du graphique: {e}")
@@ -180,22 +183,38 @@ def plot_simulation_results(result: dict, filename: str):
 @handle_error((KeyboardInterrupt,), error_log=0)
 def main():
     # Simulation n°1, la plus basique: 10 serveurs sans tricheurs, puissance de calculs aléatoire
-    print("\n\nSimulation n°1: 10 serveurs sans tricheurs\n")
-    NB_SERVEURS: int = 10
-    serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS)
-    result_1: dict = simulation(serveurs)
-    plot_simulation_results(result_1, 'simulation_results_1.png')
+    if False:
+        print("\n\nSimulation n°1: 10 serveurs sans tricheurs\n")
+        NB_SERVEURS: int = 10
+        serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS)
+        result_1: dict = simulation(serveurs)
+        plot_simulation_results(result_1, 'simulation_results_1.png')
 
-    # Simulation n°2: ajout d'un tricheur avec une forte puissance de calcul
-    print("\n\nSimulation n°2: 10 serveurs + 1 tricheur avec 20% de la puissance totale\n")
-    NB_SERVEURS: int = 10
-    serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS - 1)  # 9 serveurs honnêtes
-    puissance_totale = sum(s.puissance for s in serveurs)
-    # On ajoute un tricheur avec une puissance de calcul élevée
-    tricheur = Serveur(puissance=20*(puissance_totale/80), tricheur=True)  # Puissance plus élevée que la normale
-    serveurs.append(tricheur)
-    result_2: dict = simulation(serveurs)
-    plot_simulation_results(result_2, 'simulation_results_2.png')
+    # Simulation n°2: ajout d'un tricheur
+    if False:
+        print("\n\nSimulation n°2: 10 serveurs + 1 tricheur avec 20% de la puissance totale\n")
+        NB_SERVEURS: int = 10
+        serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS - 1)  # 9 serveurs honnêtes
+        puissance_totale = sum(s.puissance for s in serveurs)
+        # On ajoute un tricheur avec une puissance de calcul élevée
+        tricheur = Serveur(puissance=int(20*(puissance_totale/80)), tricheur=True)  # Puissance plus élevée que la normale
+        serveurs.append(tricheur)
+        result_2: dict = simulation(serveurs)
+        plot_simulation_results(result_2, 'simulation_results_2.png')
+
+    # Simulation n°3: ajout d'un tricheur avec une forte puissance de calcul
+    if True:
+        print("\n\nSimulation n°3: 10 serveurs + 1 tricheur avec 35% de la puissance totale\n")
+        NB_SERVEURS: int = 10
+        serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS - 1)  # 9 serveurs honnêtes
+        puissance_totale = sum(s.puissance for s in serveurs)
+        # On ajoute un tricheur avec une puissance de calcul élevée
+        pourcentage_tricheur: int = 35
+        puissance_tricheur: int = int(pourcentage_tricheur*(puissance_totale/(100 - pourcentage_tricheur)))
+        tricheur = Serveur(puissance=puissance_tricheur, tricheur=True)
+        serveurs.append(tricheur)
+        result_3: dict = simulation(serveurs)
+        plot_simulation_results(result_3, 'simulation_results_3.png')
 
 
 if __name__ == "__main__":

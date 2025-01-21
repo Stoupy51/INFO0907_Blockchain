@@ -39,12 +39,14 @@ class Serveur():
         for voisin in self.voisins:
             voisin.receive(message)
     
-    def recevoir(self, bloc: Bloc, rediffuse: bool = False) -> None:
+    def recevoir(self, bloc: Bloc, emetteur: Serveur, longueur_blockchain: int, rediffuse: bool = False) -> None:
         """ Fonction qui interprète les messages
 
         Args:
-            bloc        (Bloc):     Bloc reçu tout chienplement
-            rediffuse   (bool):     Indique si il rediffuse à ses voisins ou non.
+            bloc                (Bloc):     Bloc reçu tout chienplement
+            emetteur            (Serveur):  Serveur qui a envoyé le bloc
+            longueur_blockchain (int):      Longueur de la blockchain de l'émetteur
+            rediffuse           (bool):     Indique si il rediffuse à ses voisins ou non.
 
         Étapes:
             Vérifie le hash précédent
@@ -55,7 +57,14 @@ class Serveur():
         """
         # Si c'est un tricheur, il ignore les blocs des autres
         if self.tricheur:
-            return
+            if len(self.blockchain) == 0:
+                return
+        else:
+            # il n'est pas tricheur, il regarde donc comme un bon élève si la blockchain de l'émetteur est 
+            # plus longue que sa blockchain
+            if longueur_blockchain > len(self.blockchain):
+                #demander la blockchain de l'émetteur
+                self.blockchain = emetteur.blockchain.copy() # version simplifiée de la réalité
 
         # On vérifie le hash précédent
         if self.blockchain and self.blockchain[-1].hash() != bloc.hash_precedent:
