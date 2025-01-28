@@ -183,7 +183,7 @@ def plot_simulation_results(result: dict, filename: str):
 @handle_error((KeyboardInterrupt,), error_log=0)
 def main():
     # Simulation n°1, la plus basique: 10 serveurs sans tricheurs, puissance de calculs aléatoire
-    if False:
+    if True:
         print("\n\nSimulation n°1: 10 serveurs sans tricheurs\n")
         NB_SERVEURS: int = 10
         serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS)
@@ -191,7 +191,7 @@ def main():
         plot_simulation_results(result_1, 'simulation_results_1.png')
 
     # Simulation n°2: ajout d'un tricheur
-    if False:
+    if True:
         print("\n\nSimulation n°2: 10 serveurs + 1 tricheur avec 20% de la puissance totale\n")
         NB_SERVEURS: int = 10
         serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS - 1)  # 9 serveurs honnêtes
