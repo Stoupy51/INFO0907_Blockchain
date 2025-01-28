@@ -86,11 +86,8 @@ class Serveur():
 
     def recherche_bloc(self) -> Bloc|None:
         """ Fonction qui recherche un bloc """
-        # Si c'est un tricheur, il ignore le hash précédent des autres
-        hash_precedent = None if self.tricheur else (self.blockchain[-1].hash() if self.blockchain else None)
-        
         bloc = Bloc(
-            hash_precedent=hash_precedent,
+            hash_precedent=(self.blockchain[-1].hash() if self.blockchain else None),
             transactions=self.transactions_a_inserer,
             date=int(time.time())
         )
