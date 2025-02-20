@@ -69,7 +69,7 @@ def main():
     plt.ylabel("Alpha") 
     plt.xlim(0, 1)
     plt.ylim(0, 1)
-    plt.savefig("simulation_penalty_densite.png")
+    plt.savefig("penalty_simulation_densite.png")
     
     return
 
