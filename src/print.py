@@ -134,7 +134,7 @@ def measure_time(print_func: Callable = debug, message: str = "", perf_counter: 
 
 
 # Decorator that handle an error with different log levels
-def handle_error(exceptions: tuple[type[Exception], ...] = (Exception,), message: str = "", error_log: int = 3) -> Callable:
+def handle_error(exceptions: tuple[type[BaseException], ...] = (Exception,), message: str = "", error_log: int = 3) -> Callable:
 	""" Decorator that handle an error with different log levels.\n
 	Args:
 		exceptions		(tuple[Exception]):	Exceptions to handle

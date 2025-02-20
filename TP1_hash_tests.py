@@ -5,7 +5,8 @@ from src.hash import hash_naif, hash_sophistique
 from src.tests import test_frequence, test_khi2, test_rang, test_permutation
 from src.utils import generer_chaines_aleatoires, digest_sha256, conversion_en_int
 
-@measure_time(progress)
+@measure_time(progress, "Tests de hash")
+@handle_error((KeyboardInterrupt,Exception), error_log=2)
 def main():
     """ Précalculs (Génération de 10000 chaines random """
     chaines: list[str] = generer_chaines_aleatoires(longueur_mini=64, longueur_maxi=64, nombre_de_chaines=10000)
