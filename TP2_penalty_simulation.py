@@ -61,7 +61,7 @@ def main():
             total_gardien, total_tireur = simulation(100000, gardien, tireur)
             gardien.adapter(total_gardien)
 
-            total_gardien, total_tireur = simulation(10000, gardien, tireur)
+            total_gardien, total_tireur = simulation(100000, gardien, tireur)
             tireur.adapter(total_tireur)        
             #info(f"Alpha = {gardien.proba:.3f},\tBeta = {tireur.proba:.3f}")
 
