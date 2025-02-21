@@ -1,3 +1,4 @@
+
 # Importations
 from src.print import *
 from src.acteurs import *
@@ -6,8 +7,6 @@ from collections import Counter
 import matplotlib.pyplot as plt
 
 # A FAIRE: 
-# introduire des tricheurs 
-# regarder le nb de blockchains differentes (hash du dernier bloc)
 # faire 1 gros serveur
 # puissance de calcul qui monte -> faire graphique ??
 # ex à return:
@@ -16,7 +15,7 @@ import matplotlib.pyplot as plt
 # MEMORISER ??? puis faire la courbe
 
 class ConditionsDarret(Enum):
-    PLUS_DE_50_BLOCS: int = 1
+    PLUS_DE_50_BLOCS = 1
 
 
 def simulation(
@@ -188,7 +187,7 @@ def main():
         NB_SERVEURS: int = 10
         serveurs: list[Serveur] = nouvelle_simulation(NB_SERVEURS)
         result_1: dict = simulation(serveurs)
-        plot_simulation_results(result_1, 'simulation_results_1.png')
+        plot_simulation_results(result_1, "blockchain_simulation_results_1.png")
 
     # Simulation n°2: ajout d'un tricheur
     if True:
@@ -200,7 +199,7 @@ def main():
         tricheur = Serveur(puissance=int(20*(puissance_totale/80)), tricheur=True)  # Puissance plus élevée que la normale
         serveurs.append(tricheur)
         result_2: dict = simulation(serveurs)
-        plot_simulation_results(result_2, 'simulation_results_2.png')
+        plot_simulation_results(result_2, "blockchain_simulation_results_2.png")
 
     # Simulation n°3: ajout d'un tricheur avec une forte puissance de calcul
     if True:
@@ -214,7 +213,7 @@ def main():
         tricheur = Serveur(puissance=puissance_tricheur, tricheur=True)
         serveurs.append(tricheur)
         result_3: dict = simulation(serveurs)
-        plot_simulation_results(result_3, 'simulation_results_3.png')
+        plot_simulation_results(result_3, "blockchain_simulation_results_3.png")
 
 
 if __name__ == "__main__":

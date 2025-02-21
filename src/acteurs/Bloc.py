@@ -12,8 +12,8 @@ import random
 class Bloc():
     """ Classe bloc """
 
-    def __init__(self, hash_precedent: str, transactions: list[str], date: int):
-        self.hash_precedent: str = hash_precedent
+    def __init__(self, hash_precedent: int|None, transactions: list[str], date: int):
+        self.hash_precedent: int|None = hash_precedent
         self.transactions: list[str] = transactions
         self.date: int = date
         self.nonce: int = random.randint(0, NONCE_MAX)

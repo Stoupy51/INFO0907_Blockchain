@@ -1,6 +1,7 @@
 
 # Importations
 from src.print import *
+from typing import Any
 
 # Constantes
 MSG1: str = "Bonjour les amis !! L'amitié est comme le soleil qui se lève chaque jour… Elle brille sur les relations pour les éclairer de sa lumière naturelle faite d'affection et de tendresse. Je vous souhaite une très bonne journée ! Je vois Je t'envoie ce message pour te souhaiter une agréable journée avec beaucoup de délicatesse et de tendresse. Que chacune des instants de cet jour soit un poème dont la poésie embellit toute chose."
@@ -12,8 +13,8 @@ def main():
 
 	# Hachage des messages
 	from hashlib import sha256
-	cle1: sha256 = sha256(MSG1.encode("utf-8"))
-	cle2: sha256 = sha256(MSG2.encode("utf-8"))
+	cle1: Any = sha256(MSG1.encode("utf-8"))
+	cle2: Any = sha256(MSG2.encode("utf-8"))
 	resultat1: bytes = cle1.digest()
 	resultat2: bytes = cle2.digest()
 

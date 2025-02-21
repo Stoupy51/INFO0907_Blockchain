@@ -21,7 +21,7 @@ class Serveur():
     def __str__(self):
         return f"Server #{self.id:02d}, nb_blocks={len(self.blockchain)}, puissance={self.puissance}"
     
-    def afficher_blockchain(self, limit: int = 5) -> str:
+    def afficher_blockchain(self, limit: int = 5) -> None:
         # Début du message
         long: int = len(self.blockchain)
         message: str = f"Longueur de la blockchain: {long}"
@@ -37,7 +37,7 @@ class Serveur():
     # Fonctions spécifiques à la classe
     def diffuser(self, message) -> None:
         for voisin in self.voisins:
-            voisin.receive(message)
+            voisin.recevoir(message, self, len(self.blockchain), False)
     
     def recevoir(self, bloc: Bloc, emetteur: Serveur, longueur_blockchain: int, rediffuse: bool = False) -> None:
         """ Fonction qui interprète les messages
@@ -55,7 +55,7 @@ class Serveur():
             On l'accepte donc
             Il renvoie le bloc à ses voisins car il est gentil (optionnel)
         """
-        # Si c'est un tricheur, il ignore les blocs des autres
+        # Si c'est un tricheur, il ignore les blocs des autres si il n'a pas de blockchain
         if self.tricheur:
             if len(self.blockchain) == 0:
                 return
@@ -70,8 +70,8 @@ class Serveur():
         if self.blockchain and self.blockchain[-1].hash() != bloc.hash_precedent:
             return
 
-        # On vérifie la liste de transactions
-        # if not bloc.transactions: # Pas implementé
+        # On vérifie la liste de transactions (Pas implementé car pas pertinent dans notre modélisation)
+        # if not bloc.transactions:
         #    return
 
         # On vérifie si le hash du bloc est valide

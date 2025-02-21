@@ -6,7 +6,10 @@ import random
 
 # Functions
 def selection_serveur_aleatoire(serveurs: list[Serveur]) -> Serveur:
-    """ Selectionne un serveur aléatoire selon la puissance
+    """ Selectionne un serveur aléatoire selon la puissance (choix aléatoire pondéré par la puissance)
+
+    Remarque:
+    - on aurait pu utiliser np.random.choice(serveurs, p=[x.puissance for x in serveurs])
 
     Args:
         serveurs    (list[Serveur]):    Liste de serveurs
@@ -31,7 +34,7 @@ def selection_serveur_aleatoire(serveurs: list[Serveur]) -> Serveur:
         puissance_random -= s.puissance
         if puissance_random <= 0:
             return s
-    return None
+    return serveurs[0]  # <= Jamais atteint
 
 
 def puissance_stp(la_range: tuple[int, int, int] = PUISSANCE_RANGE) -> int:
