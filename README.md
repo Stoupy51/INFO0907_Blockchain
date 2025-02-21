@@ -12,9 +12,10 @@
 │   ├── utils.py          # 🛠️ Fonctions utilitaires
 │   └── ...               # 📦 Et autres modules
 │
-├── TP1_hash_tests.py           # 📝 Script principal pour le TP n°1 (Fonctions de hachage et tests)
-├── TP2_penalty_simulation.py   # 📝 Script principal pour le TP n°2 (Simulation de penalty)
-├── all_doctests.py             # ✅ Exécution de tous les tests doctests de tous les modules présents dans src et affichage du temps d'exécution
+├── TP1_hash_tests.py                   # 📝 Script principal pour le TP n°1 (Fonctions de hachage et tests)
+├── TP2_penalty_simulation.py           # 📝 Script principal pour le TP n°2 (Simulation de penalty)
+├── TP3_4_5_blockchain_simulation.py    # 📝 Script principal pour le TP n°3 (Simulation de blockchain)
+├── all_doctests.py                     # ✅ Exécution de tous les tests doctests de tous les modules présents dans src et affichage du temps d'exécution
 └── README.md
 ```
 
@@ -29,5 +30,8 @@ python TP1_hash_tests.py
 
 # 🎯 Exécuter l'entièreté du TP2
 python TP2_penalty_simulation.py
+
+# 🎯 Exécuter l'entièreté du TP3
+python TP3_4_5_blockchain_simulation.py
 ```
 
