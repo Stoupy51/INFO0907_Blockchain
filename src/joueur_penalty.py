@@ -1,10 +1,12 @@
 
-PAS = 0.01
+# Imports
+from __future__ import annotations
 
+# Classe Joueur
 class Joueur:
-    """
-    Classe pour simuler un joueur (tireur ou gardien) dans la simulation de penalty
-    """
+    """ Classe pour simuler un joueur (tireur ou gardien) dans la simulation de penalty """
+    PAS: float = 0.01
+
     def __init__(self,proba):
         self.proba = proba
         self.score = 0
@@ -16,7 +18,7 @@ class Joueur:
         """
         if nouveau_score < self.score:
             self.direction *= -1
-        self.proba += self.direction * PAS
+        self.proba += self.direction * Joueur.PAS
         if self.proba < 0:
             self.proba = 0
         if self.proba > 1:

@@ -35,42 +35,51 @@ def simulation(boucle: int, gardien: Joueur, tireur: Joueur) -> tuple[int,int]:
 @measure_time(progress, "Simulation de penalty")
 @handle_error((KeyboardInterrupt,Exception), error_log=2)
 def main():
-    # On initialise les joueurs
-    alpha: float = 2/7
-    beta: float = 4/7
-    gardien = Joueur(proba=alpha)
-    tireur = Joueur(proba=beta)
+    valeurs_pas: list[float] = [0.01, 0.005, 0.0025]
+    for i, pas in enumerate(valeurs_pas):
+        progress(f"Simulation ({i+1}/{len(valeurs_pas)}) de penalty avec un pas de {pas}")
+        Joueur.PAS = pas
 
-    # Listes pour les historiques
-    alpha_historique: list = []
-    beta_historique: list = []
+        # On initialise les joueurs
+        alpha: float = 0.7
+        beta: float = 0.7
+        # alpha: float = 2/7
+        # beta: float = 4/7
+        gardien = Joueur(proba=alpha)
+        tireur = Joueur(proba=beta)
 
-    # Boucle de 10000 étapes
-    for i in range(NB_ETAPES):
-        if i%666 == 0:
-            info(f"{(i/NB_ETAPES)*100:.2f}% (Alpha={gardien.proba:.3f},\tBeta={tireur.proba:.3f})")
-        #time.sleep(1)
+        # Listes pour les historiques
+        alpha_historique: list = []
+        beta_historique: list = []
 
-        total_gardien, total_tireur = simulation(100000, gardien, tireur)
-        gardien.adapter(total_gardien)
-        alpha_historique.append(gardien.proba)
+        # Boucle de 10000 étapes
+        for i in range(NB_ETAPES):
+            if i%666 == 0:
+                info(f"{(i/NB_ETAPES)*100:.2f}% (Alpha={gardien.proba:.3f},\tBeta={tireur.proba:.3f})")
+            #time.sleep(1)
 
-        total_gardien, total_tireur = simulation(100000, gardien, tireur)
-        tireur.adapter(total_tireur)        
-        #info(f"Alpha = {gardien.proba:.3f},\tBeta = {tireur.proba:.3f}")
-        beta_historique.append(tireur.proba)
+            total_gardien, total_tireur = simulation(100000, gardien, tireur)
+            gardien.adapter(total_gardien)
 
-    # Construction graphique
-    # Création d'un histogramme 2D pour visualiser la densité
-    plt.hist2d(beta_historique, alpha_historique, bins=50, cmap='viridis', density=True)
-    plt.colorbar(label='Densité')
-    plt.title("Simulation de penalty - Graphique de densité")
-    plt.xlabel("Beta")
-    plt.ylabel("Alpha") 
-    plt.xlim(0, 1)
-    plt.ylim(0, 1)
-    plt.savefig("penalty_simulation_densite.png")
-    
+            total_gardien, total_tireur = simulation(10000, gardien, tireur)
+            tireur.adapter(total_tireur)        
+            #info(f"Alpha = {gardien.proba:.3f},\tBeta = {tireur.proba:.3f}")
+
+            alpha_historique.append(gardien.proba)
+            beta_historique.append(tireur.proba)
+
+        ## Construction graphique
+        # Création d'un histogramme 2D pour visualiser la densité
+        plt.hist2d(beta_historique, alpha_historique, bins=50, cmap="viridis", density=True, range=[[0,1], [0,1]])
+        plt.colorbar(label="Densité")
+        plt.title(f"Simulation de penalty - Graphique de densité (PAS={pas})")
+        plt.xlabel("Beta β")
+        plt.ylabel("Alpha α") 
+        plt.xlim(0, 1)
+        plt.ylim(0, 1)
+        plt.savefig(f"penalty_simulation_densite_{pas}_de_pas.png")
+        plt.close()
+        
     return
 
 if __name__ == "__main__":
